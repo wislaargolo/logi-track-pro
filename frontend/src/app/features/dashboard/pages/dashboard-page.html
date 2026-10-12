@@ -1,0 +1,226 @@
+<header class="page-header"><h1>Dashboard</h1></header>
+<div class="dashboard-grid">
+  <section
+    class="surface panel kilometers"
+    aria-labelledby="kilometers-heading"
+    [attr.aria-busy]="store.kilometers().loading"
+  >
+    <h2 id="kilometers-heading">Total de KM percorridos</h2>
+    <div class="vehicle-filter">
+      <mat-form-field
+        ><mat-label>Veículo</mat-label
+        ><input
+          matInput
+          maxlength="100"
+          placeholder="Busque um veículo ou selecione toda a frota"
+          autocomplete="off"
+          [formControl]="searchControl"
+          [matAutocomplete]="vehicles"
+          (input)="onVehicleInput()"
+          (focus)="searchVehicles()"
+      /></mat-form-field>
+      <mat-autocomplete
+        #vehicles="matAutocomplete"
+        [displayWith]="displayVehicle"
+        (optionSelected)="selectVehicle($event.option.value)"
+      >
+        @if (vehicleSearch.loading()) {
+          <mat-option
+            disabled
+            class="vehicle-loading-option"
+            aria-label="Buscando veículos"
+            aria-live="polite"
+          >
+            <mat-spinner diameter="18" aria-hidden="true" />
+          </mat-option>
+        } @else if (!vehicleSearch.error()) {
+          <mat-option [value]="null">Toda a frota</mat-option>
+          <mat-optgroup label="Veículos">
+            @for (vehicle of vehicleSearch.vehicles(); track vehicle.id) {
+              <mat-option [value]="vehicle"
+                >{{ vehicle.licensePlate }} · {{ vehicle.model }}</mat-option
+              >
+            } @empty {
+              <mat-option disabled>Nenhum veículo encontrado. Refine a busca.</mat-option>
+            }
+          </mat-optgroup>
+        }
+      </mat-autocomplete>
+    </div>
+    @if (vehicleSearch.error()) {
+      <div role="alert" class="report-error">
+        <p>{{ vehicleSearch.error() }}</p>
+        <button mat-button type="button" (click)="vehicleSearch.retry()">
+          Tentar novamente a busca
+        </button>
+      </div>
+    }
+    @if (store.kilometers().loading) {
+      <p
+        role="status"
+        class="metric-value metric-loading"
+        aria-label="Atualizando o total de quilômetros"
+      >
+        <mat-spinner diameter="24" aria-hidden="true" />
+      </p>
+    } @else if (store.kilometers().error) {
+      <div role="alert" class="report-error">
+        <p>{{ store.kilometers().error }}</p>
+        <button mat-button type="button" (click)="store.retryKilometers()">Tentar novamente</button>
+      </div>
+    } @else if (store.kilometers().data) {
+      <p class="metric-value">{{ formatNumber(store.kilometers().data!.totalKm) }} km</p>
+    }
+  </section>
+  <section
+    class="surface panel cost"
+    aria-labelledby="cost-heading"
+    [attr.aria-busy]="store.cost().loading"
+  >
+    <h2 id="cost-heading">Projeção financeira</h2>
+    @if (store.cost().loading) {
+      <div role="status" class="report-loading" aria-label="Atualizando a projeção financeira">
+        <mat-spinner diameter="24" aria-hidden="true" />
+      </div>
+    } @else if (store.cost().error) {
+      <div role="alert" class="report-error">
+        <p>{{ store.cost().error }}</p>
+        <button mat-button type="button" (click)="store.retryCost()">Tentar novamente</button>
+      </div>
+    } @else if (store.cost().data) {
+      <p class="period">{{ monthLabel(store.cost().data!.month) }}</p>
+      <p class="metric-value">{{ store.cost().data!.estimatedCost | brl }}</p>
+    }
+  </section>
+  <section
+    class="surface panel trips"
+    aria-labelledby="trips-heading"
+    [attr.aria-busy]="store.trips().loading"
+  >
+    <h2 id="trips-heading">Volume por categoria</h2>
+    @if (store.trips().loading) {
+      <div role="status" class="report-loading" aria-label="Atualizando o volume por categoria">
+        <mat-spinner diameter="24" aria-hidden="true" />
+      </div>
+    } @else if (store.trips().error) {
+      <div role="alert" class="report-error">
+        <p>{{ store.trips().error }}</p>
+        <button mat-button type="button" (click)="store.retryTrips()">Tentar novamente</button>
+      </div>
+    } @else if (store.trips().data) {
+      @if (noTrips()) {
+        <p class="muted">Nenhuma viagem concluída</p>
+      }
+      @for (row of categories(); track row.label) {
+        <div class="category-row">
+          <div class="category-label">
+            <span>{{ row.label }}</span
+            ><span
+              >{{ formatNumber(row.count) }}
+              {{ row.count === 1 ? 'viagem concluída' : 'viagens concluídas' }}</span
+            >
+          </div>
+          <div class="category-bar" aria-hidden="true">
+            <span [style.width.%]="row.width"></span>
+          </div>
+        </div>
+      }
+    }
+  </section>
+  <section
+    class="surface panel ranking"
+    aria-labelledby="ranking-heading"
+    [attr.aria-busy]="store.ranking().loading"
+  >
+    <h2 id="ranking-heading">Ranking de utilização</h2>
+    @if (store.ranking().loading) {
+      <div role="status" class="report-loading" aria-label="Atualizando o ranking de utilização">
+        <mat-spinner diameter="24" aria-hidden="true" />
+      </div>
+    } @else if (store.ranking().error) {
+      <div role="alert" class="report-error">
+        <p>{{ store.ranking().error }}</p>
+        <button mat-button type="button" (click)="store.retryRanking()">Tentar novamente</button>
+      </div>
+    } @else if (store.ranking().data) {
+      @if (store.ranking().data!.length === 0) {
+        <p class="muted">Nenhum veículo disponível</p>
+      } @else {
+        <ol aria-label="Veículos por utilização">
+          @for (vehicle of store.ranking().data; track vehicle.vehicleId; let position = $index) {
+            <li>
+              <span class="position" aria-hidden="true">{{ position + 1 }}º</span>
+              <div class="vehicle">
+                <span>{{ vehicle.model }}</span
+                ><span class="muted">{{ vehicle.licensePlate }}</span>
+              </div>
+              <span class="ranking-value">{{ formatNumber(vehicle.totalKm) }} km</span>
+            </li>
+          }
+        </ol>
+      }
+    }
+  </section>
+  <section
+    class="surface panel upcoming"
+    aria-labelledby="upcoming-heading"
+    [attr.aria-busy]="store.upcoming().loading"
+  >
+    <div class="panel-header">
+      <h2 id="upcoming-heading">Manutenções pendentes</h2>
+      <a mat-button class="app-button app-button--tertiary" routerLink="/manutencoes"
+        >Ver manutenções</a
+      >
+    </div>
+    @if (store.upcoming().loading) {
+      <div role="status" class="report-loading" aria-label="Atualizando as manutenções pendentes">
+        <mat-spinner diameter="24" aria-hidden="true" />
+      </div>
+    } @else if (store.upcoming().error) {
+      <div role="alert" class="report-error">
+        <p>{{ store.upcoming().error }}</p>
+        <button mat-button type="button" (click)="store.retryUpcoming()">Tentar novamente</button>
+      </div>
+    } @else if (store.upcoming().data) {
+      @if (store.upcoming().data!.length === 0) {
+        <p class="muted">Nenhuma manutenção agendada</p>
+      } @else {
+        <div class="maintenance-cards">
+          @for (item of store.upcoming().data; track item.id) {
+            <a
+              class="maintenance-card"
+              [routerLink]="['/manutencoes', item.id]"
+              [attr.aria-label]="
+                (item.serviceType ?? 'Manutenção não informada') +
+                ' — detalhes da manutenção ' +
+                item.id
+              "
+            >
+              <div class="maintenance-card-service">
+                <span class="maintenance-card-label">Tipo de serviço</span>
+                <span class="maintenance-card-title">
+                  {{ item.serviceType ?? 'Manutenção não informada' }}
+                </span>
+              </div>
+              <div class="maintenance-card-vehicle">
+                <span class="maintenance-card-label">Veículo</span>
+                <span class="maintenance-card-vehicle-value">
+                  {{ item.model ?? 'Veículo não informado' }}
+                  @if (item.licensePlate) {
+                    <span class="muted plate">{{ item.licensePlate }}</span>
+                  }
+                </span>
+              </div>
+              <dl>
+                <div>
+                  <dt>Data de início</dt>
+                  <dd>{{ item.startDate | dateOnly }}</dd>
+                </div>
+              </dl>
+            </a>
+          }
+        </div>
+      }
+    }
+  </section>
+</div>

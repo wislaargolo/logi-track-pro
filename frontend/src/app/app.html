@@ -1,0 +1,41 @@
+@if (showShell()) {
+  <a class="skip-link" href="#main">Ir para o conteúdo</a>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" routerLink="/dashboard" aria-label="LogiTrack Pro, dashboard">
+        <span class="brand-mark" aria-hidden="true">L</span>
+        <span>LogiTrack <strong>Pro</strong></span>
+      </a>
+      <nav aria-label="Navegação principal">
+        <a routerLink="/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page">
+          <ng-icon name="lucideLayoutDashboard" size="19" strokeWidth="1.7" aria-hidden="true" />
+          Dashboard
+        </a>
+        <a routerLink="/manutencoes" routerLinkActive="active" ariaCurrentWhenActive="page">
+          <ng-icon name="lucideClipboardList" size="19" strokeWidth="1.7" aria-hidden="true" />
+          Manutenções
+        </a>
+      </nav>
+      @if (authStore.user(); as user) {
+        <div class="user-session" aria-label="Sessão atual">
+          <span class="user-name" [title]="user.email">{{ user.name }}</span>
+          <button class="logout-button" type="button" (click)="logout()">Sair</button>
+        </div>
+      }
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <span>
+          Central de operações <span class="separator">/</span>
+          <a [routerLink]="routeFeature().link">{{ routeFeature().label }}</a>
+          @if (routeSection(); as section) {
+            <span class="separator">/</span> <a [routerLink]="currentRouteLink()">{{ section }}</a>
+          }
+        </span>
+      </header>
+      <main class="page" id="main" tabindex="-1"><router-outlet /></main>
+    </div>
+  </div>
+} @else {
+  <router-outlet />
+}

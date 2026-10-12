@@ -1,0 +1,48 @@
+:host {
+  display: inline-flex;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: 5px;
+  font-size: var(--font-size-caption);
+  line-height: var(--font-line-height-caption);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--font-letter-spacing-normal);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.pending {
+  color: var(--status-pending);
+  background: var(--status-pending-surface);
+}
+
+.active {
+  color: var(--status-active);
+  background: var(--status-active-surface);
+}
+
+.complete {
+  color: var(--status-complete);
+  background: var(--status-complete-surface);
+}
+
+.legacy {
+  color: var(--status-legacy);
+  background: var(--status-legacy-surface);
+}
+
+.empty {
+  color: var(--muted);
+  background: var(--soft-neutral);
+}

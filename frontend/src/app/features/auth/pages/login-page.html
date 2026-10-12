@@ -1,0 +1,44 @@
+<main class="login-page" id="main">
+  <section class="login-card" aria-labelledby="login-title">
+    <a class="login-brand" routerLink="/login" aria-label="LogiTrack Pro">
+      <span class="brand-mark" aria-hidden="true">L</span>
+      <span>LogiTrack <strong>Pro</strong></span>
+    </a>
+    <div class="login-heading">
+      <h1 id="login-title">Entrar na sua conta</h1>
+    </div>
+
+    @if (error(); as message) {
+      <div class="login-error" role="alert">{{ message }}</div>
+    }
+
+    <form novalidate [formGroup]="form" (ngSubmit)="submit()">
+      <mat-form-field>
+        <mat-label>E-mail</mat-label>
+        <input matInput type="email" autocomplete="email" formControlName="email" />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <mat-error>Informe um e-mail válido.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Senha</mat-label>
+        <input
+          matInput
+          type="password"
+          autocomplete="current-password"
+          formControlName="password"
+        />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <mat-error>Informe a senha.</mat-error>
+        }
+      </mat-form-field>
+      <button mat-flat-button class="login-submit" type="submit" [disabled]="submitting()">
+        @if (submitting()) {
+          <mat-spinner diameter="20" aria-label="Entrando" />
+        } @else {
+          Entrar
+        }
+      </button>
+    </form>
+  </section>
+</main>

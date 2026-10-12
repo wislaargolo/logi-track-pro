@@ -1,0 +1,452 @@
+<header class="page-header">
+  <div><h1>Manutenções</h1></div>
+</header>
+
+<div class="list-actions">
+  <section class="filters-panel" aria-labelledby="filters-title">
+    <form [formGroup]="filters" (ngSubmit)="applyFilters()">
+      <div class="filter-toolbar">
+        <mat-form-field appearance="outline">
+          <ng-icon
+            matPrefix
+            class="search-field-icon"
+            name="lucideSearch"
+            size="var(--button-icon-size)"
+            strokeWidth="1.8"
+            aria-hidden="true"
+          />
+          <mat-label class="search-field-label">Buscar manutenção ou veículo</mat-label>
+          <input
+            matInput
+            class="search-field-input"
+            formControlName="search"
+            placeholder="Ex.: revisão, ABC-1234 ou sedan"
+            maxlength="100"
+          />
+          <mat-error>Use até 100 caracteres.</mat-error>
+        </mat-form-field>
+        <button
+          #filterOrigin="cdkOverlayOrigin"
+          mat-stroked-button
+          type="button"
+          class="app-button app-button--secondary app-button--field"
+          cdkOverlayOrigin
+          aria-haspopup="dialog"
+          aria-controls="filters-popover"
+          [attr.aria-expanded]="filterOpen"
+          (click)="toggleFilters()"
+        >
+          <ng-icon
+            class="button-icon"
+            name="lucideSlidersHorizontal"
+            size="var(--button-icon-size)"
+            strokeWidth="1.8"
+            aria-hidden="true"
+          />
+          Filtros
+        </button>
+      </div>
+      <ng-template
+        cdkConnectedOverlay
+        cdkConnectedOverlayHasBackdrop
+        cdkConnectedOverlayPush
+        cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+        [cdkConnectedOverlayOrigin]="filterOrigin"
+        [cdkConnectedOverlayOpen]="filterOpen"
+        [cdkConnectedOverlayPositions]="filterPositions"
+        (cdkConnectedOverlayDetach)="filterOpen = false"
+        (backdropClick)="closeFilters()"
+      >
+        <div
+          id="filters-popover"
+          class="filter-popover"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="filters-title"
+          tabindex="-1"
+          cdkTrapFocus
+          [cdkTrapFocusAutoCapture]="true"
+        >
+          <div class="filter-popover-heading">
+            <h2 id="filters-title" tabindex="-1" cdkFocusInitial>Filtros</h2>
+            <button
+              class="app-icon-button filter-close-button"
+              type="button"
+              aria-label="Fechar filtros"
+              (click)="closeFilters()"
+            >
+              <ng-icon
+                class="button-icon"
+                name="lucideX"
+                size="var(--button-icon-size)"
+                strokeWidth="1.8"
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+          <div class="filter-fields">
+            <mat-form-field appearance="outline"
+              ><mat-label>Status</mat-label
+              ><input
+                matInput
+                formControlName="status"
+                placeholder="Todos os status"
+                maxlength="20"
+                [matAutocomplete]="statusSuggestions"
+              /><mat-autocomplete
+                #statusSuggestions="matAutocomplete"
+                [displayWith]="displayStatus"
+              >
+                @for (status of statuses; track status.value) {
+                  <mat-option [value]="status.value">{{ status.label }}</mat-option>
+                }</mat-autocomplete
+              ><mat-error>Use até 20 caracteres.</mat-error></mat-form-field
+            >
+            <div class="filter-range-row">
+              <mat-form-field appearance="outline"
+                ><mat-label>Início a partir de</mat-label
+                ><input
+                  matInput
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="10"
+                  placeholder="dd/mm/yyyy"
+                  formControlName="startDateFrom"
+                  (input)="formatDateInput('startDateFrom')"
+                /><mat-error>Use o formato dd/mm/yyyy.</mat-error></mat-form-field
+              >
+              <mat-form-field appearance="outline"
+                ><mat-label>Início até</mat-label
+                ><input
+                  matInput
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="10"
+                  placeholder="dd/mm/yyyy"
+                  formControlName="startDateTo"
+                  (input)="formatDateInput('startDateTo')"
+                /><mat-error>Use o formato dd/mm/yyyy.</mat-error></mat-form-field
+              >
+            </div>
+            <div class="filter-range-row">
+              <mat-form-field appearance="outline"
+                ><mat-label>Custo mínimo (R$)</mat-label
+                ><input
+                  matInput
+                  type="number"
+                  formControlName="estimatedCostMin"
+                  step="0.01"
+                /><mat-error>Use até 8 dígitos e 2 casas decimais.</mat-error></mat-form-field
+              >
+              <mat-form-field appearance="outline"
+                ><mat-label>Custo máximo (R$)</mat-label
+                ><input
+                  matInput
+                  type="number"
+                  formControlName="estimatedCostMax"
+                  step="0.01"
+                /><mat-error>Use até 8 dígitos e 2 casas decimais.</mat-error></mat-form-field
+              >
+            </div>
+          </div>
+          @if (filters.hasError('dateRange') && filters.touched) {
+            <p class="filter-error" role="alert">
+              A data mínima não pode ser posterior à data máxima.
+            </p>
+          }
+          @if (filters.hasError('costRange') && filters.touched) {
+            <p class="filter-error" role="alert">
+              O custo mínimo não pode ser maior que o custo máximo.
+            </p>
+          }
+          <div class="filter-popover-actions">
+            <button
+              mat-button
+              class="app-button app-button--tertiary"
+              type="button"
+              (click)="resetFilters()"
+            >
+              Limpar
+            </button>
+            <button
+              mat-flat-button
+              class="app-button app-button--primary"
+              type="button"
+              (click)="applyFilters()"
+            >
+              Aplicar
+            </button>
+          </div>
+        </div>
+      </ng-template>
+      @if (!filterOpen) {
+        @if (filters.hasError('dateRange') && filters.touched) {
+          <p class="filter-error" role="alert">
+            A data mínima não pode ser posterior à data máxima.
+          </p>
+        }
+        @if (filters.hasError('costRange') && filters.touched) {
+          <p class="filter-error" role="alert">
+            O custo mínimo não pode ser maior que o custo máximo.
+          </p>
+        }
+      }
+    </form>
+  </section>
+
+  <a mat-flat-button class="app-button app-button--primary" routerLink="/manutencoes/nova">
+    <ng-icon
+      class="button-icon"
+      name="lucidePlus"
+      size="var(--button-icon-size)"
+      strokeWidth="1.8"
+      aria-hidden="true"
+    />
+    Nova manutenção
+  </a>
+</div>
+
+<section class="surface maintenance-list-surface" aria-label="Lista de manutenções">
+  @if (store.deleteError(); as message) {
+    <div class="error-state" role="alert">
+      <strong>Não foi possível excluir</strong>
+      <p>{{ message }}</p>
+    </div>
+  }
+
+  <section class="results" aria-label="Lista de manutenções" [attr.aria-busy]="store.loading()">
+    @if (store.loading() && !store.response()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Carregando manutenções" />
+      <div class="loading-state" role="status">Carregando manutenções…</div>
+    } @else if (store.error(); as message) {
+      <div class="empty-state" role="alert">
+        <h2>Não foi possível carregar as manutenções</h2>
+        <p>{{ message }}</p>
+        <button
+          mat-stroked-button
+          class="app-button app-button--secondary"
+          type="button"
+          (click)="retry()"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    } @else if (store.response(); as response) {
+      @if (store.loading()) {
+        <mat-progress-bar
+          class="results-progress"
+          mode="indeterminate"
+          aria-label="Atualizando manutenções"
+        />
+      }
+      @if (response.content.length) {
+        <div
+          class="table-scroll"
+          tabindex="0"
+          role="region"
+          aria-label="Tabela de manutenções, role para ver todas as colunas"
+        >
+          <table
+            mat-table
+            matSort
+            [matSortDisableClear]="true"
+            [dataSource]="response.content"
+            [matSortActive]="store.sortField()"
+            [matSortDirection]="store.sortDirection()"
+            (matSortChange)="changeSort($event)"
+          >
+            <ng-container matColumnDef="vehicle"
+              ><th *matHeaderCellDef mat-header-cell>Veículo</th>
+              <td *matCellDef="let record" mat-cell>
+                <strong class="vehicle-model">{{ record.model ?? 'Modelo não informado' }}</strong>
+                <span class="plate">{{ record.licensePlate ?? 'Placa não informada' }}</span>
+              </td></ng-container
+            >
+            <ng-container matColumnDef="serviceType"
+              ><th *matHeaderCellDef mat-header-cell mat-sort-header>Manutenção</th>
+              <td *matCellDef="let record" mat-cell>
+                <span class="maintenance-text">{{
+                  record.serviceType ?? 'Manutenção não informada'
+                }}</span>
+              </td></ng-container
+            >
+            <ng-container matColumnDef="startDate"
+              ><th *matHeaderCellDef mat-header-cell mat-sort-header>Início</th>
+              <td *matCellDef="let record" mat-cell>
+                {{ record.startDate | dateOnly }}
+              </td></ng-container
+            >
+            <ng-container matColumnDef="expectedEndDate"
+              ><th *matHeaderCellDef mat-header-cell mat-sort-header>Previsão de fim</th>
+              <td *matCellDef="let record" mat-cell>
+                {{ record.expectedEndDate | dateOnly }}
+              </td></ng-container
+            >
+            <ng-container matColumnDef="estimatedCost"
+              ><th *matHeaderCellDef mat-header-cell mat-sort-header>Custo estimado</th>
+              <td *matCellDef="let record" mat-cell class="money">
+                {{ record.estimatedCost | brl }}
+              </td></ng-container
+            >
+            <ng-container matColumnDef="status"
+              ><th *matHeaderCellDef mat-header-cell mat-sort-header>Status</th>
+              <td *matCellDef="let record" mat-cell>
+                <app-maintenance-status [status]="record.status" /></td
+            ></ng-container>
+            <ng-container matColumnDef="actions"
+              ><th *matHeaderCellDef mat-header-cell aria-label="Ações"></th>
+              <td *matCellDef="let record" mat-cell>
+                <div class="row-actions">
+                  <button
+                    mat-icon-button
+                    class="app-icon-button"
+                    aria-label="Ações da manutenção"
+                    [matMenuTriggerFor]="recordActions"
+                    [disabled]="store.deletingId() !== null"
+                  >
+                    <span aria-hidden="true">⋮</span>
+                  </button>
+                  <mat-menu #recordActions="matMenu">
+                    <a
+                      mat-menu-item
+                      class="app-menu-item"
+                      [routerLink]="['/manutencoes', record.id]"
+                      >Visualizar manutenção</a
+                    >
+                    <a
+                      mat-menu-item
+                      class="app-menu-item"
+                      [routerLink]="['/manutencoes', record.id, 'editar']"
+                      >Editar manutenção</a
+                    >
+                    <button
+                      mat-menu-item
+                      class="app-menu-item app-menu-item--destructive"
+                      type="button"
+                      (click)="confirmDelete(record)"
+                    >
+                      Excluir manutenção
+                    </button>
+                  </mat-menu>
+                </div>
+              </td></ng-container
+            >
+            <tr *matHeaderRowDef="columns" mat-header-row></tr>
+            <tr *matRowDef="let row; columns: columns" mat-row></tr>
+          </table>
+        </div>
+        <div class="mobile-records">
+          @for (record of response.content; track record.id) {
+            <article class="mobile-record">
+              <header>
+                <div>
+                  <strong class="vehicle-model">{{
+                    record.model ?? 'Modelo não informado'
+                  }}</strong>
+                  <span class="plate">{{ record.licensePlate ?? 'Placa não informada' }}</span>
+                </div>
+                <div class="mobile-record-actions">
+                  <app-maintenance-status [status]="record.status" />
+                  <div class="row-actions">
+                    <button
+                      mat-icon-button
+                      class="app-icon-button"
+                      aria-label="Ações da manutenção"
+                      [matMenuTriggerFor]="mobileRecordActions"
+                      [disabled]="store.deletingId() !== null"
+                    >
+                      <span aria-hidden="true">⋮</span>
+                    </button>
+                    <mat-menu #mobileRecordActions="matMenu">
+                      <a
+                        mat-menu-item
+                        class="app-menu-item"
+                        [routerLink]="['/manutencoes', record.id]"
+                        >Visualizar manutenção</a
+                      >
+                      <a
+                        mat-menu-item
+                        class="app-menu-item"
+                        [routerLink]="['/manutencoes', record.id, 'editar']"
+                        >Editar manutenção</a
+                      >
+                      <button
+                        mat-menu-item
+                        class="app-menu-item app-menu-item--destructive"
+                        type="button"
+                        (click)="confirmDelete(record)"
+                      >
+                        Excluir manutenção
+                      </button>
+                    </mat-menu>
+                  </div>
+                </div>
+              </header>
+              <h3>{{ record.serviceType ?? 'Manutenção não informada' }}</h3>
+              <dl>
+                <div>
+                  <dt>Início</dt>
+                  <dd>{{ record.startDate | dateOnly }}</dd>
+                </div>
+                <div>
+                  <dt>Custo estimado</dt>
+                  <dd>{{ record.estimatedCost | brl }}</dd>
+                </div>
+                <div>
+                  <dt>Finalização prevista</dt>
+                  <dd>{{ record.expectedEndDate | dateOnly }}</dd>
+                </div>
+              </dl>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-symbol" aria-hidden="true">≡</div>
+          <h2>
+            {{
+              store.hasFilters()
+                ? 'Nenhuma manutenção encontrada'
+                : 'Nenhuma manutenção nesta página'
+            }}
+          </h2>
+          <p>
+            {{
+              store.hasFilters()
+                ? 'Experimente outros filtros ou limpe a busca para ver todas as manutenções.'
+                : 'Crie uma manutenção ou volte para a primeira página da listagem.'
+            }}
+          </p>
+          @if (store.hasFilters()) {
+            <button
+              mat-button
+              class="app-button app-button--tertiary"
+              type="button"
+              (click)="clearFiltersAndApply()"
+            >
+              Limpar filtros
+            </button>
+          } @else {
+            <a
+              mat-flat-button
+              class="app-button app-button--primary"
+              routerLink="/manutencoes/nova"
+            >
+              Nova manutenção
+            </a>
+          }
+        </div>
+      }
+      <mat-paginator
+        class="maintenance-paginator"
+        aria-label="Paginação das manutenções"
+        [length]="response.page.totalElements"
+        [pageIndex]="response.page.number"
+        [pageSize]="response.page.size"
+        [pageSizeOptions]="pageSizes"
+        [showFirstLastButtons]="true"
+        (page)="changePage($event)"
+      />
+    }
+  </section>
+</section>

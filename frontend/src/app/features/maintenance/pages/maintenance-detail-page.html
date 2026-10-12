@@ -1,0 +1,81 @@
+@if (store.loading()) {
+  <div class="surface loading-state" role="status">
+    <mat-spinner diameter="24" aria-label="Carregando" />Carregando manutenção…
+  </div>
+} @else if (store.error(); as message) {
+  <section class="surface empty-state" role="alert">
+    <h1>{{ store.notFound() ? 'Manutenção não encontrada' : 'Não foi possível carregar' }}</h1>
+    <p>{{ message }}</p>
+    @if (!store.notFound()) {
+      <button
+        mat-stroked-button
+        class="app-button app-button--secondary"
+        type="button"
+        (click)="retry()"
+      >
+        Tentar novamente
+      </button>
+    }
+    <a mat-button class="app-button app-button--tertiary" routerLink="/manutencoes">
+      Voltar para a listagem
+    </a>
+  </section>
+} @else if (store.record(); as item) {
+  <header class="page-header">
+    <div><h1>Detalhes da manutenção</h1></div>
+    <div class="detail-actions">
+      <a
+        mat-stroked-button
+        class="app-button app-button--secondary"
+        [routerLink]="store.deletingId() !== null ? null : ['/manutencoes', item.id, 'editar']"
+        [attr.aria-disabled]="store.deletingId() !== null"
+        >Editar manutenção</a
+      ><button
+        mat-button
+        class="app-button app-button--destructive"
+        type="button"
+        [disabled]="store.deletingId() !== null"
+        (click)="confirmDelete()"
+      >
+        Excluir manutenção
+      </button>
+    </div>
+  </header>
+  @if (store.deleteError(); as message) {
+    <div class="error-state" role="alert">
+      <strong>Não foi possível excluir</strong>
+      <p>{{ message }}</p>
+    </div>
+  }
+  <section class="surface detail-card" aria-labelledby="record-title">
+    <div class="detail-heading">
+      <div>
+        <h2 id="record-title">{{ item.serviceType ?? 'Manutenção não informada' }}</h2>
+        <p>Informações da manutenção</p>
+      </div>
+      <app-maintenance-status [status]="item.status" />
+    </div>
+    <dl class="detail-grid">
+      <div>
+        <dt>Veículo</dt>
+        <dd class="plate">{{ item.licensePlate ?? 'Não informado' }}</dd>
+      </div>
+      <div>
+        <dt>Data de início</dt>
+        <dd>{{ item.startDate | dateOnly }}</dd>
+      </div>
+      <div>
+        <dt>Finalização prevista</dt>
+        <dd>{{ item.expectedEndDate | dateOnly }}</dd>
+      </div>
+      <div>
+        <dt>Custo estimado</dt>
+        <dd class="cost">{{ item.estimatedCost | brl }}</dd>
+      </div>
+      <div class="detail-observation">
+        <dt>Observação</dt>
+        <dd>{{ item.observation || 'Não informado' }}</dd>
+      </div>
+    </dl>
+  </section>
+}

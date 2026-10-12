@@ -1,0 +1,72 @@
+<header class="page-header">
+  <div>
+    <h1>{{ store.editing() ? 'Editar manutenção' : 'Nova manutenção' }}</h1>
+  </div>
+</header>
+@if (store.loading()) {
+  <div class="surface loading-state" role="status">
+    <mat-spinner diameter="24" aria-label="Carregando" />Carregando manutenção…
+  </div>
+} @else if (store.loadError(); as message) {
+  <section class="surface empty-state" role="alert">
+    <h2>
+      {{
+        store.notFound() ? 'Manutenção não encontrada' : 'Não foi possível carregar a manutenção'
+      }}
+    </h2>
+    <p>{{ message }}</p>
+    @if (!store.notFound()) {
+      <button
+        mat-stroked-button
+        class="app-button app-button--secondary"
+        type="button"
+        (click)="retry()"
+      >
+        Tentar novamente
+      </button>
+    }
+    <a mat-button class="app-button app-button--tertiary" routerLink="/manutencoes">
+      Voltar para a listagem
+    </a>
+  </section>
+} @else {
+  @if (store.saveError(); as message) {
+    <div class="error-state" role="alert">
+      <strong>Não foi possível salvar</strong>
+      <p>{{ message }}</p>
+    </div>
+  }
+  <section class="surface form-card" aria-label="Formulário de manutenção">
+    <app-maintenance-form
+      [initialValue]="store.initialValue()"
+      [submitting]="store.submitting()"
+      [serverErrors]="store.serverErrors()"
+      [vehicles]="vehicleStore.vehicles()"
+      [vehiclesLoading]="vehicleStore.loading()"
+      [vehicleError]="vehicleStore.error()"
+      (vehicleSearch)="vehicleStore.search($event)"
+      (vehicleRetry)="vehicleStore.retry()"
+      (submitted)="save($event)"
+    />
+  </section>
+  <div class="form-actions" aria-label="Ações do formulário">
+    <button
+      mat-button
+      class="app-button app-button--tertiary"
+      type="button"
+      [disabled]="store.submitting()"
+      (click)="cancel()"
+    >
+      Cancelar
+    </button>
+    <button
+      mat-flat-button
+      class="app-button app-button--primary"
+      type="submit"
+      form="maintenance-form"
+      [disabled]="store.submitting()"
+    >
+      {{ store.submitting() ? 'Salvando…' : 'Salvar manutenção' }}
+    </button>
+  </div>
+}

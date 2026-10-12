@@ -1,0 +1,160 @@
+<form id="maintenance-form" novalidate [formGroup]="form" (ngSubmit)="submit()">
+  <div class="form-grid">
+    <div class="field full-width">
+      <mat-form-field appearance="outline">
+        <mat-label>Veículo</mat-label>
+        <input
+          id="vehicle-search"
+          matInput
+          aria-describedby="vehicleId-error"
+          placeholder="Busque pela placa ou modelo"
+          autocomplete="off"
+          maxlength="100"
+          [formControl]="searchControl"
+          [matAutocomplete]="vehicleOptions"
+          [errorStateMatcher]="vehicleErrorStateMatcher"
+          [attr.aria-invalid]="!!errorFor('vehicleId') || !!vehicleError()"
+          (input)="onVehicleInput()"
+          (focus)="searchVehicles()"
+        />
+        <mat-autocomplete
+          #vehicleOptions="matAutocomplete"
+          [displayWith]="displayVehicle"
+          (optionSelected)="selectVehicle($event.option.value)"
+        >
+          @if (vehiclesLoading()) {
+            <mat-option disabled>Carregando veículos…</mat-option>
+          } @else {
+            @for (vehicle of vehicles(); track vehicle.id) {
+              <mat-option [value]="vehicle"
+                >{{ vehicle.licensePlate }} · {{ vehicle.model }}</mat-option
+              >
+            } @empty {
+              <mat-option disabled>Nenhum veículo encontrado. Refine a busca.</mat-option>
+            }
+          }
+        </mat-autocomplete>
+        @if (errorFor('vehicleId'); as error) {
+          <mat-error id="vehicleId-error">{{ error }}</mat-error>
+        }
+        @if (vehicleError(); as error) {
+          <mat-error>
+            {{ error }}
+            <button
+              mat-stroked-button
+              class="app-button app-button--secondary"
+              type="button"
+              [disabled]="submitting()"
+              (click)="vehicleRetry.emit()"
+            >
+              Tentar novamente
+            </button>
+          </mat-error>
+        }
+      </mat-form-field>
+    </div>
+    <div class="field">
+      <mat-form-field appearance="outline">
+        <mat-label>Data de início</mat-label>
+        <input
+          matInput
+          type="text"
+          inputmode="numeric"
+          maxlength="10"
+          placeholder="dd/mm/yyyy"
+          lang="pt-BR"
+          formControlName="startDate"
+          aria-describedby="startDate-error"
+          required
+          (input)="formatDateInput('startDate')"
+        />
+        @if (errorFor('startDate'); as error) {
+          <mat-error id="startDate-error">{{ error }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+    <div class="field">
+      <mat-form-field appearance="outline">
+        <mat-label>Término previsto</mat-label>
+        <input
+          matInput
+          type="text"
+          inputmode="numeric"
+          maxlength="10"
+          placeholder="dd/mm/yyyy"
+          lang="pt-BR"
+          formControlName="expectedEndDate"
+          aria-describedby="expectedEndDate-error"
+          [errorStateMatcher]="expectedEndDateErrorStateMatcher"
+          (input)="formatDateInput('expectedEndDate')"
+        />
+        @if (errorFor('expectedEndDate'); as error) {
+          <mat-error id="expectedEndDate-error">{{ error }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+    <div class="field full-width">
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de manutenção</mat-label>
+        <input
+          matInput
+          formControlName="serviceType"
+          maxlength="100"
+          aria-describedby="maintenance-error"
+          required
+          placeholder="Ex.: revisão de freios"
+        />
+        @if (errorFor('serviceType'); as error) {
+          <mat-error id="maintenance-error">{{ error }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+    <div class="field full-width">
+      <mat-form-field appearance="outline">
+        <mat-label>Observação</mat-label>
+        <textarea
+          matInput
+          formControlName="observation"
+          maxlength="1000"
+          rows="5"
+          aria-describedby="observation-error"
+          placeholder="Detalhes opcionais da manutenção"
+        ></textarea>
+        @if (errorFor('observation'); as error) {
+          <mat-error id="observation-error">{{ error }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+    <div class="field">
+      <mat-form-field appearance="outline">
+        <mat-label>Custo estimado (R$)</mat-label>
+        <input
+          matInput
+          type="number"
+          min="0"
+          max="99999999.99"
+          step="0.01"
+          formControlName="estimatedCost"
+          aria-describedby="estimatedCost-error"
+          required
+        />
+        @if (errorFor('estimatedCost'); as error) {
+          <mat-error id="estimatedCost-error">{{ error }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+    <div class="field">
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status" aria-describedby="status-error" required>
+          @for (option of statusOptions; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+        @if (errorFor('status'); as error) {
+          <mat-error id="status-error">{{ error }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,261 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+.app-shell {
+  display: grid;
+  grid-template-columns: 208px minmax(0, 1fr);
+  min-height: 100vh;
+}
+.sidebar {
+  background: var(--sidebar);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6) var(--space-3) var(--space-5);
+}
+.brand {
+  align-items: center;
+  color: var(--white);
+  display: flex;
+  gap: var(--space-2);
+  font-size: var(--font-size-body);
+  line-height: var(--font-line-height-brand);
+  letter-spacing: var(--font-letter-spacing-tight);
+  padding: 0 var(--space-2);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.brand strong {
+  color: var(--sidebar-accent);
+  font-weight: var(--font-weight-medium);
+}
+.brand-mark {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--sidebar-accent);
+  border-radius: 7px;
+  background: var(--primary-dark);
+  height: 32px;
+  width: 32px;
+  font-weight: var(--font-weight-bold);
+}
+nav a {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-3);
+  border-radius: 6px;
+  color: var(--sidebar-text);
+  font-size: var(--font-size-label);
+  line-height: var(--font-line-height-ui);
+  font-weight: var(--font-weight-regular);
+  text-decoration: none;
+  transition:
+    background-color var(--interaction-duration) var(--interaction-easing),
+    color var(--interaction-duration) var(--interaction-easing),
+    box-shadow var(--interaction-duration) var(--interaction-easing);
+}
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-7);
+}
+nav a:hover {
+  color: var(--white);
+  background: var(--hover-surface-dark);
+}
+nav a.active {
+  color: var(--white);
+  background: var(--sidebar-active);
+  box-shadow: inset 3px 0 var(--sidebar-accent);
+  font-weight: var(--font-weight-medium);
+}
+nav a.active:hover {
+  background: color-mix(in srgb, var(--sidebar-active) 88%, var(--sidebar-accent));
+}
+nav a:focus-visible {
+  outline: 2px solid var(--sidebar-accent);
+  outline-offset: -2px;
+}
+nav ng-icon {
+  flex: 0 0 auto;
+}
+
+.user-session {
+  align-items: center;
+  border-top: 1px solid color-mix(in srgb, var(--sidebar-text) 20%, transparent);
+  display: flex;
+  gap: var(--space-2);
+  justify-content: space-between;
+  margin-top: auto;
+  padding: var(--space-4) var(--space-2) 0;
+}
+.user-name {
+  color: var(--sidebar-text);
+  flex: 1;
+  font-size: var(--font-size-label);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.logout-button {
+  background: transparent;
+  border: 0;
+  color: var(--sidebar-accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--font-size-label);
+  padding: var(--space-2);
+}
+.logout-button:hover {
+  color: var(--white);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.logout-button:focus-visible {
+  outline: 2px solid var(--sidebar-accent);
+  outline-offset: 2px;
+}
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--bg);
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 0 var(--space-7);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--font-size-label);
+  line-height: var(--font-line-height-body);
+  color: var(--muted);
+  gap: var(--space-4);
+}
+.topbar > span {
+  width: 100%;
+  max-width: 1350px;
+  margin: 0 auto;
+}
+.topbar a {
+  color: inherit;
+  text-decoration: none;
+  transition:
+    color var(--interaction-duration) var(--interaction-easing),
+    text-decoration-color var(--interaction-duration) var(--interaction-easing);
+}
+.topbar a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.topbar strong {
+  color: var(--text);
+  font-weight: var(--font-weight-medium);
+}
+.separator {
+  margin: 0 var(--space-2);
+  color: var(--sidebar-muted);
+}
+
+.page {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-7) var(--space-8);
+  flex: 1;
+}
+
+.skip-link {
+  position: fixed;
+  top: -60px;
+  left: 16px;
+  padding: var(--space-3) var(--space-5);
+  background: var(--surface);
+  color: var(--text);
+  z-index: 1000;
+  border: 2px solid var(--primary);
+}
+.skip-link:focus {
+  top: 8px;
+}
+@media (max-width: 850px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+  .sidebar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-height: 56px;
+    padding: var(--space-3) var(--space-4);
+  }
+  .user-session {
+    border-top: 0;
+    margin-top: 0;
+    padding: 0;
+  }
+  .user-name {
+    display: none;
+  }
+
+  nav a {
+    padding: var(--space-3) var(--space-4);
+  }
+  nav {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-2);
+    margin-top: 0;
+  }
+  .topbar {
+    min-height: 52px;
+    padding: 0 var(--space-4);
+  }
+  .page {
+    padding: var(--space-4) var(--space-5) var(--space-7);
+  }
+}
+@media (max-width: 580px) {
+  .sidebar {
+    flex-wrap: nowrap;
+  }
+  .brand > span:last-child {
+    display: none;
+  }
+  nav {
+    width: auto;
+  }
+  nav a {
+    flex: 1;
+    justify-content: center;
+  }
+}
+@media (max-width: 480px) {
+  .brand {
+    font-size: var(--font-size-label);
+    padding: 0;
+    gap: var(--space-1);
+  }
+  .brand-mark {
+    width: 26px;
+    height: 26px;
+  }
+  nav a {
+    gap: var(--space-1);
+    font-size: var(--font-size-label);
+    padding: var(--space-2) var(--space-2);
+  }
+
+  .page {
+    padding: var(--space-3) var(--space-4) var(--space-6);
+  }
+}

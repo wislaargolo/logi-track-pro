@@ -1,0 +1,12 @@
+{
+  "name": "logi-track-pro-monorepo",
+  "private": true,
+  "workspaces": ["frontend"],
+  "scripts": {
+    "frontend:start": "npm --workspace logi-track-web run start",
+    "frontend:build": "npm --workspace logi-track-web run build",
+    "frontend:lint": "npm --workspace logi-track-web run lint",
+    "frontend:format": "npm --workspace logi-track-web run format",
+    "frontend:format:check": "npm --workspace logi-track-web run format:check"
+  }
+}
