@@ -1,0 +1,30 @@
+# Contexto allowlist: apenas os arquivos necessários aos builds.
+**
+!.mvn/
+!.mvn/wrapper/
+!.mvn/wrapper/maven-wrapper.properties
+!mvnw
+!pom.xml
+!backend/
+!backend/pom.xml
+!backend/src/
+!backend/src/main/
+!backend/src/main/**
+!package.json
+!package-lock.json
+!frontend/
+!frontend/Dockerfile
+!frontend/package.json
+!frontend/angular.json
+!frontend/tsconfig*.json
+!frontend/nginx.conf
+!frontend/src/
+!frontend/src/**
+!frontend/public/
+!frontend/public/**
+
+# Nunca incluir configuração privada ou material de credenciais.
+**/.env
+**/.env.*
+**/*.pem
+**/*.key

@@ -1,0 +1,6 @@
+# Defaults exclusivos para desenvolvimento local.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/logitrack}
+    username: ${DB_USERNAME:logitrack}
+    password: ${DB_PASSWORD:postgres}

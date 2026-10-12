@@ -1,0 +1,6 @@
+# O Compose fornece a conexão pela rede interna, sem defaults de credenciais.
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
