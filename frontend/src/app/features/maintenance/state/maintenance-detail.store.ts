@@ -53,7 +53,9 @@ export const MaintenanceDetailStore = signalStore(
     function deleteMaintenance(id: number) {
       return defer(() => {
         if (store.deletingId() !== null) return EMPTY;
+
         patchState(store, { deletingId: id, deleteError: null });
+
         return api.delete(id).pipe(
           map(() => true),
           catchError((error: unknown) => {

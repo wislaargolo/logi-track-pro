@@ -58,27 +58,32 @@ export const MaintenanceFormStore = signalStore(
           }),
       },
     );
+
+    function saveMaintenance(dto: UpdateMaintenanceDto) {
+      return defer(() => {
+        if (store.submitting() || store.loading() || store.loadError()) return EMPTY;
+
+        const id = store.requestedId() === null ? null : Number(store.requestedId());
+        patchState(store, { submitting: true, saveError: null, serverErrors: [] });
+
+        return (id === null ? api.create(dto) : api.update(id, dto)).pipe(
+          catchError((error: unknown) => {
+            patchState(store, {
+              saveError: errorMessage(error),
+              serverErrors: error instanceof ApiError ? error.fieldErrors : [],
+            });
+            return of(null);
+          }),
+          finalize(() => patchState(store, { submitting: false })),
+        );
+      }).pipe(takeUntilDestroyed(destroyRef));
+    }
+
     return {
       load,
 
       retry: () => load(store.requestedId()),
-      save(dto: UpdateMaintenanceDto) {
-        return defer(() => {
-          if (store.submitting() || store.loading() || store.loadError()) return EMPTY;
-          const id = store.requestedId() === null ? null : Number(store.requestedId());
-          patchState(store, { submitting: true, saveError: null, serverErrors: [] });
-          return (id === null ? api.create(dto) : api.update(id, dto)).pipe(
-            catchError((error: unknown) => {
-              patchState(store, {
-                saveError: errorMessage(error),
-                serverErrors: error instanceof ApiError ? error.fieldErrors : [],
-              });
-              return of(null);
-            }),
-            finalize(() => patchState(store, { submitting: false })),
-          );
-        }).pipe(takeUntilDestroyed(destroyRef));
-      },
+      save: saveMaintenance,
     };
   }),
 );
