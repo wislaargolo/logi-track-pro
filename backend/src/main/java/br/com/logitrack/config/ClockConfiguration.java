@@ -5,10 +5,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class DashboardClockConfiguration {
+public class ClockConfiguration {
 
   @Bean
-  Clock dashboardClock() {
+  Clock clock() {
     return Clock.systemDefaultZone();
   }
 }

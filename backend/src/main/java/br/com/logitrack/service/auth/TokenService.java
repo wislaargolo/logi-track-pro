@@ -1,6 +1,6 @@
 package br.com.logitrack.service.auth;
 
-import br.com.logitrack.config.AuthProperties;
+import br.com.logitrack.config.properties.AuthProperties;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import java.time.Clock;

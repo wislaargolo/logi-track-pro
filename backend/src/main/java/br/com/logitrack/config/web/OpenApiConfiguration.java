@@ -1,4 +1,4 @@
-package br.com.logitrack.config;
+package br.com.logitrack.config.web;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

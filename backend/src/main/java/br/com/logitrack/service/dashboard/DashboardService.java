@@ -1,6 +1,6 @@
 package br.com.logitrack.service.dashboard;
 
-import br.com.logitrack.config.DashboardProperties;
+import br.com.logitrack.config.properties.DashboardProperties;
 import br.com.logitrack.dto.dashboard.CurrentMonthMaintenanceCostDto;
 import br.com.logitrack.dto.dashboard.TotalKilometersDto;
 import br.com.logitrack.dto.dashboard.TripsByCategoryDto;

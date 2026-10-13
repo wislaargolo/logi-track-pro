@@ -1,4 +1,4 @@
-package br.com.logitrack.config;
+package br.com.logitrack.config.properties;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;

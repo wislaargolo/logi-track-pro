@@ -1,5 +1,6 @@
-package br.com.logitrack.config;
+package br.com.logitrack.config.bootstrap;
 
+import br.com.logitrack.config.properties.AuthProperties;
 import br.com.logitrack.service.user.UserService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

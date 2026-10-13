@@ -1,5 +1,6 @@
-package br.com.logitrack.config;
+package br.com.logitrack.config.security;
 
+import br.com.logitrack.config.properties.AuthProperties;
 import br.com.logitrack.exception.handler.SecurityProblemHandlers;
 import br.com.logitrack.utils.JwtUtils;
 import com.auth0.jwt.JWT;
