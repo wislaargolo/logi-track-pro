@@ -14,6 +14,7 @@
 }
 .upcoming {
   grid-column: 1 / -1;
+  container-type: inline-size;
 }
 p {
   margin-bottom: 0;
@@ -127,11 +128,12 @@ li + li {
   margin-top: var(--space-1);
 }
 .maintenance-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-3);
 }
 .maintenance-card {
+  flex: 1 1 calc((100% - 2 * var(--space-3)) / 3);
   display: block;
   min-width: 0;
   padding: var(--space-4);
@@ -195,6 +197,16 @@ li + li {
   white-space: nowrap;
   border: 0;
 }
+@container (min-width: 1000px) {
+  .maintenance-card {
+    flex-basis: calc((100% - 4 * var(--space-3)) / 5);
+  }
+}
+@container (max-width: 620px) {
+  .maintenance-card {
+    flex-basis: calc((100% - var(--space-3)) / 2);
+  }
+}
 @media (max-width: 650px) {
   .dashboard-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -211,8 +223,8 @@ li + li {
   .panel-header h2 {
     margin-bottom: 0;
   }
-  .maintenance-cards {
-    grid-template-columns: minmax(0, 1fr);
+  .maintenance-card {
+    flex-basis: 100%;
   }
   li {
     grid-template-columns: auto minmax(0, 1fr);
